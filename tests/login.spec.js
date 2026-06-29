@@ -2,19 +2,27 @@ import { test, expect } from '@playwright/test';
 
 test('CourierBidz Login', async ({ page }) => {
 
-  await page.goto('https://cbd-courierbidz.iihdev.com/login');
+    const emailTextbox = page.getByRole('textbox', { name: 'Email' });
+    const passwordTextbox = page.getByRole('textbox', { name: 'Password' });
+    const signInButton = page.getByRole('button', { name: 'Sign in' });
 
-  await page.locator('input[type="email"]')
-    .fill('ringer2@yopmail.com');
+    await page.goto('https://cbd-courierbidz.iihdev.com/login');
 
-  await page.locator('input[type="password"]')
-    .fill('12345678');
+    await emailTextbox.fill('ringer2@yopmail.com');
+    await passwordTextbox.fill('12345678');
+    await signInButton.click();
 
-  await page.locator('button[type="submit"]')
+    await expect(page).toHaveURL(/dashboard/);
+
+    await page
+    .getByRole('navigation')
+    .getByRole('button', { name: 'Create Job' })
     .click();
 
-  await page.waitForLoadState('networkidle');
-
-  await expect(page).toHaveURL(/dashboard/);
+    // Select Manual Mode
+    await page.getByRole('button', { name: 'Manual mode' }).click();
+    // Verify page
+    await expect(page.getByText('Manual Job Creation')).toBeVisible();
+    await page.waitForTimeout(5000);
 
 });
